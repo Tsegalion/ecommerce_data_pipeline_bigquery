@@ -1,4 +1,4 @@
-# Data Engineering Capstone Project
+# End-to-End Data Pipeline for Brazilian E-Commerce Insights
 
 ## Overview
 
@@ -28,8 +28,8 @@ This project involves an end-to-end ELT process using the Brazilian E-Commerce d
 ## Clone the Repository
 
 ```plaintext
-git clone https://github.com/Tsegalion/DE_captone_project.git
-cd DE_captone_project
+git clone https://github.com/Tsegalion/ecommerce_data_pipeline_bigquery.git
+cd ecommerce_data_pipeline_bigquery
 ```
 
 ### Create and activate a virtual environment:
