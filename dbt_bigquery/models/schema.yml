@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Staging model for orders data"
+    columns:
+      - name: order_id
+        description: "Primary key for orders"
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_products
+    description: "Staging model for products data"
+    columns:
+      - name: product_id
+        description: "Primary key for products"
+        tests:
+          - unique
+          - not_null
+
+  - name: int_sales_by_category
+    description: "Intermediate model aggregating sales by product category"
+    columns:
+      - name: category
+        description: "Product category"
+        tests:
+          - not_null
+      - name: total_sales
+        description: "Total sales amount"
+        tests:
+          - not_null
+
+  - name: int_avg_delivery_time
+    description: "Intermediate model calculating average delivery time for orders"
+    columns:
+      - name: order_id
+        description: "Order ID"
+        tests:
+          - unique
+          - not_null
+      - name: avg_delivery_time
+        description: "Average delivery time"
+        tests:
+          - not_null
+
+  - name: int_orders_by_state
+    description: "Intermediate model counting orders per state"
+    columns:
+      - name: state
+        description: "State"
+        tests:
+          - not_null
+      - name: total_orders
+        description: "Total number of orders"
+        tests:
+          - not_null

@@ -1,0 +1,73 @@
+{
+    "products": [
+      {"name": "product_id", "type": "STRING", "mode": "REQUIRED"},
+      {"name": "product_category_name", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "product_name_length", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "product_description_length", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "product_photos_qty", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "product_weight_g", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "product_length_cm", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "product_height_cm", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "product_width_cm", "type": "INTEGER", "mode": "NULLABLE"}
+    ],
+    "orders": [
+      {"name": "order_id", "type": "STRING", "mode": "REQUIRED"},
+      {"name": "customer_id", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "order_status", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "order_purchase_timestamp", "type": "TIMESTAMP", "mode": "NULLABLE"},
+      {"name": "order_approved_at", "type": "TIMESTAMP", "mode": "NULLABLE"},
+      {"name": "order_delivered_carrier_date", "type": "TIMESTAMP", "mode": "NULLABLE"},
+      {"name": "order_delivered_customer_date", "type": "TIMESTAMP", "mode": "NULLABLE"},
+      {"name": "order_estimated_delivery_date", "type": "TIMESTAMP", "mode": "NULLABLE"}
+    ],
+    "customers": [
+      {"name": "customer_id", "type": "STRING", "mode": "REQUIRED"},
+      {"name": "customer_unique_id", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "customer_zip_code_prefix", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "customer_city", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "customer_state", "type": "STRING", "mode": "NULLABLE"}
+    ],
+    "order_items": [
+      {"name": "order_id", "type": "STRING", "mode": "REQUIRED"},
+      {"name": "order_item_id", "type": "INTEGER", "mode": "REQUIRED"},
+      {"name": "product_id", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "seller_id", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "shipping_limit_date", "type": "TIMESTAMP", "mode": "NULLABLE"},
+      {"name": "price", "type": "FLOAT", "mode": "NULLABLE"},
+      {"name": "freight_value", "type": "FLOAT", "mode": "NULLABLE"}
+    ],
+    "sellers": [
+      {"name": "seller_id", "type": "STRING", "mode": "REQUIRED"},
+      {"name": "seller_zip_code_prefix", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "seller_city", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "seller_state", "type": "STRING", "mode": "NULLABLE"}
+    ],
+    "product_category_name_translation": [
+      {"name": "product_category_name", "type": "STRING", "mode": "REQUIRED"},
+      {"name": "product_category_name_english", "type": "STRING", "mode": "NULLABLE"}
+    ],
+    "geolocation": [
+      {"name": "geolocation_zip_code_prefix", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "geolocation_lat", "type": "FLOAT", "mode": "NULLABLE"},
+      {"name": "geolocation_lng", "type": "FLOAT", "mode": "NULLABLE"},
+      {"name": "geolocation_city", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "geolocation_state", "type": "STRING", "mode": "NULLABLE"}
+    ],
+    "order_reviews": [
+      {"name": "review_id", "type": "STRING", "mode": "REQUIRED"},
+      {"name": "order_id", "type": "STRING", "mode": "REQUIRED"},
+      {"name": "review_score", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "review_comment_title", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "review_comment_message", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "review_creation_date", "type": "TIMESTAMP", "mode": "NULLABLE"},
+      {"name": "review_answer_timestamp", "type": "TIMESTAMP", "mode": "NULLABLE"}
+    ],
+    "order_payments": [
+      {"name": "order_id", "type": "STRING", "mode": "REQUIRED"},
+      {"name": "payment_sequential", "type": "INTEGER", "mode": "REQUIRED"},
+      {"name": "payment_type", "type": "STRING", "mode": "NULLABLE"},
+      {"name": "payment_installments", "type": "INTEGER", "mode": "NULLABLE"},
+      {"name": "payment_value", "type": "FLOAT", "mode": "NULLABLE"}
+    ]
+  }
+  
