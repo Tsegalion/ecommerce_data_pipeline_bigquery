@@ -1,4 +1,4 @@
-# End-to-End Data Pipeline for Brazilian E-Commerce Insights
+# End-to-End Data Pipeline for Brazilian E-Commerce Analytics
 
 ## Overview
 
