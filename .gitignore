@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environment
+.env
+venv/
+credentials
+
+# Docker
+*.log
+*.pid
+*.swp
+
+# Postgres
+pg_data/
+
+*.cfg
+*.conf
+webserver_config.py
+
+*.png
+*.jpg
