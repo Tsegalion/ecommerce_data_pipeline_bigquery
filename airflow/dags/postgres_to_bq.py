@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from utils.big_query import BigQueryHelper
 from airflow.decorators import dag, task
 from datetime import datetime, timedelta
@@ -45,12 +46,13 @@ default_args = {
     schedule_interval=timedelta(days=1),
     catchup=False,
 )
+
 def extract_postgres_load_bq():
 
     @task
     def extract_data_from_postgres(tables_queries):
         """
-        Extract data from PostgreSQL.
+        Extract data from PostgreSQL in parallel.
 
         Parameters:
         - tables_queries: Dictionary with table IDs and their corresponding SQL queries.
@@ -58,16 +60,27 @@ def extract_postgres_load_bq():
         Returns:
         - data: A dictionary with table IDs as keys and extracted data as DataFrames.
         """
+        logging.info("Starting parallel data extraction from PostgreSQL")
         data = {}
-        for table_id, query in tables_queries.items():
-            # Execute query to fetch data from PostgreSQL
-            result = execute_query(query)
-            if result:
-                # Convert result to DataFrame
-                df = pd.DataFrame(result)
-                data[table_id] = df
-            else:
-                logging.error(f"No data returned from PostgreSQL for table {table_id}")
+
+        # Use ThreadPoolExecutor for parallel query execution
+        with ThreadPoolExecutor(max_workers=4) as executor:  # Adjust max_workers based on your database and system capacity
+            future_to_table = {
+                executor.submit(execute_query, query): table_id for table_id, query in tables_queries.items()
+            }
+
+            for future in as_completed(future_to_table):
+                table_id = future_to_table[future]
+                try:
+                    result = future.result()  # Get query result
+                    if result:
+                        data[table_id] = pd.DataFrame(result)  # Convert to DataFrame
+                        logging.info(f"Data extracted for table {table_id}")
+                    else:
+                        logging.warning(f"No data returned for table {table_id}")
+                except Exception as e:
+                    logging.error(f"Error extracting data for table {table_id}: {e}")
+
         return data
 
     @task
@@ -78,21 +91,46 @@ def extract_postgres_load_bq():
         Parameters:
         - dataset_id: The ID of the BigQuery dataset.
         - data: A dictionary with table IDs as keys and extracted data as DataFrames.
-        """
-        # Create dataset if not exists
-        bq_helper.create_dataset(dataset_id)
+        """ 
+        logging.info("Starting data load to BigQuery")
+        try:
+            # Create dataset if not exists
+            bq_helper.create_dataset(dataset_id)
+        except Exception as e:
+            logging.error(f"Error creating BigQuery dataset {dataset_id}: {e}")
+            return
 
-        for table_id, df in data.items():
-            # Load schema from schema folder to create the tables in BigQuery
-            with open(config.SCHEMA_FILE, 'r') as f:
-                schema = json.load(f)[table_id]  # Load schema for specific table
-            bq_helper.create_table(dataset_id, table_id, schema)  # Create table if not exists
+        # Load schema from schema folder to create the tables in BigQuery
+        with open(config.SCHEMA_FILE, 'r') as f:
+            schemas = json.load(f)
 
-            if df is not None:
-                bq_helper.load_data_to_bq(dataset_id, table_id, df, 'dataframe')  # Load data to BigQuery
-                logging.info(f"Data loaded to BigQuery table {table_id} successfully")
-            else:
-                logging.error(f"No data to load to BigQuery for table {table_id}")
+        # Function to load a single table to BigQuery
+        def load_single_table(table_id, df, schema):
+            try:
+                bq_helper.create_table(dataset_id, table_id, schema)  # Create table if not exists
+                if not df.empty:
+                    bq_helper.load_data_to_bq(dataset_id, table_id, df, 'dataframe')  # Load data to BigQuery
+                    logging.info(f"Data loaded to BigQuery table {table_id} successfully")
+                else:
+                    logging.warning(f"Skipping empty DataFrame for table {table_id}")
+            except Exception as e:
+                logging.error(f"Error loading data to BigQuery for table {table_id}: {e}")
+
+        # Create a thread pool to load tables in parallel
+        with ThreadPoolExecutor() as executor:
+            futures = []
+            for table_id, df in data.items():
+                schema = schemas.get(table_id)
+                if schema:
+                    futures.append(executor.submit(load_single_table, table_id, df, schema))
+                else:
+                    logging.error(f"Schema for table {table_id} not found. Skipping.")
+
+            # Wait for all tasks to complete
+            for future in as_completed(futures):
+                future.result()  # Ensure all threads complete
+
+        logging.info("Finished loading data to BigQuery.")
 
     # List of tables and queries
     tables_queries = {
